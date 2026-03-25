@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Car Expert | AI Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #FCFDFF;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* التصميم الرئيسي */
+        .dashboard {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+            position: relative;
+        }
+
+        /* القائمة الجانبية السوداء */
+        .sidebar {
+            width: 320px;
+            background: #000000;
+            border-top-right-radius: 20px;
+            border-bottom-right-radius: 20px;
+            padding: 40px 20px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 2;
+        }
+
+        .logo-area {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-area img {
+            width: 140px;
+            height: auto;
+            border-radius: 12px;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: #4c9aff;
+            color: #000;
+        }
+
+        .nav-item i {
+            font-size: 22px;
+            width: 28px;
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            flex: 1;
+            padding: 24px 32px;
+            overflow-y: auto;
+            background: #F8F9FC;
+            position: relative;
+        }
+
+        /* شريط البحث والأزرار */
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .search-box {
+            background: white;
+            border-radius: 30px;
+            padding: 12px 20px;
+            width: 300px;
+            border: 1px solid #11034C;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            font-size: 16px;
+            width: 100%;
+            background: transparent;
+        }
+
+        .action-btn {
+            background: black;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+        }
+
+        .action-btn:hover {
+            background: #333;
+        }
+
+        /* كروت الإحصائيات */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 30px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: #000;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 8px;
+            font-size: 18px;
+        }
+
+        /* حاوية الشات والرسم البياني */
+        .content-split {
+            display: flex;
+            gap: 24px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .chart-area {
+            flex: 1;
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            min-width: 300px;
+        }
+
+        .chat-area {
+            width: 420px;
+            background: #1a1a2e;
+            border-radius: 24px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        /* تصميم الشات (مطابق لشكل Gemini) */
+        .chat-header {
+            background: #0f0f1a;
+            padding: 16px 20px;
+            border-bottom: 1px solid #2d2d44;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-header img {
+            height: 36px;
+            border-radius: 8px;
+        }
+
+        .chat-header h3 {
+            color: #4c9aff;
+            font-size: 1.2rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: #1a1a2e;
+        }
+
+        .message {
+            display: flex;
+            flex-direction: column;
+            max-width: 85%;
+        }
+
+        .user-message {
+            align-self: flex-end;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+        }
+
+        .message-content {
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .user-message .message-content {
+            background: #4c9aff;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-message .message-content {
+            background: #2d2d44;
+            color: #e4e4e7;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-input-area {
+            background: #0f0f1a;
+            padding: 12px;
+            border-top: 1px solid #2d2d44;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .chat-input-area textarea {
+            flex: 1;
+            background: #1a1a2e;
+            border: 1px solid #2d2d44;
+            border-radius: 24px;
+            padding: 10px 16px;
+            color: white;
+            font-family: inherit;
+            resize: none;
+            font-size: 14px;
+        }
+
+        .chat-input-area button {
+            background: #4c9aff;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .suggestion-card {
+            background: #1a5c8c;
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin-top: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .booking-card {
+            background: #2d2d44;
+            border-radius: 16px;
+            padding: 12px;
+            margin-top: 8px;
+        }
+
+        .booking-input {
+            width: 100%;
+            padding: 8px;
+            margin: 6px 0;
+            background: #1a1a2e;
+            border: 1px solid #3d3d5c;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .booking-btn {
+            background: #4c9aff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        /* أيقونات مؤقتة */
+        .icon {
+            font-style: normal;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1100px) {
+            .sidebar { width: 260px; }
+            .stats-grid { grid-template-columns: repeat(2,1fr); }
+            .content-split { flex-direction: column; }
+            .chat-area { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- القائمة الجانبية -->
+        <div class="sidebar">
+            <div class="logo-area">
+                <img src="https://placehold.co/140x60/000/4c9aff?text=Car+Expert" alt="Logo">
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item active">
+                    <span class="icon">📊</span> Dashboard
+                </div>
+                <div class="nav-item">
+                    <span class="icon">🔧</span> Maintenance Center
+                </div>
+                <div class="nav-item">
+                    <span class="icon">👤</span> Admin
+                </div>
+                <div class="nav-item">
+                    <span class="icon">👤</span> Profile
+                </div>
+                <div class="nav-item">
+                    <span class="icon">📋</span> Form
+                </div>
+                <div class="nav-item">
+                    <span class="icon">🚪</span> Sign Out
+                </div>
+            </div>
+        </div>
+
+        <!-- المحتوى الرئيسي -->
+        <div class="main-content">
+            <div class="top-bar">
+                <div class="search-box">
+                    <span>🔍</span>
+                    <input type="text" placeholder="Search...">
+                </div>
+                <button class="action-btn">Add</button>
+                <button class="action-btn">Edit</button>
+            </div>
+
+            <!-- كروت الإحصائيات -->
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-number">2</div><div class="stat-label">Active Car</div></div>
+                <div class="stat-card"><div class="stat-number">6</div><div class="stat-label">Total Car</div></div>
+                <div class="stat-card"><div class="stat-number">6</div><div class="stat-label">Total Drivers</div></div>
+                <div class="stat-card"><div class="stat-number">5</div><div class="stat-label">Total Customers</div></div>
+            </div>
+
+            <!-- محتوى الرسم البياني + الشات -->
+            <div class="content-split">
+                <!-- الرسم البياني (من تصميم Figma) -->
+                <div class="chart-area">
+                    <div style="height: 200px; background: #f0f2f5; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: #aaa;">📊 Interactive Chart (Figma style)</div>
+                    <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: space-between; font-size: 12px; color: #666;">
+                        <span>Figma</span><span>Sketch</span><span>XD</span><span>PS</span><span>AI</span><span>CorelDRAW</span><span>InDesign</span><span>Canva</span><span>Webflow</span><span>Affinity</span>
+                    </div>
+                </div>
+
+                <!-- شات Car Expert AI -->
+                <div class="chat-area" id="chatArea">
+                    <div class="chat-header">
+                        <img src="https://placehold.co/36x36/4c9aff/white?text=CE" alt="Car Expert">
+                        <h3>Car Expert AI Assistant</h3>
+                    </div>
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message bot-message">
+                            <div class="message-content">👋 مرحباً بك في Car Expert! اسألني عن أي مشكلة في سيارتك، وسأقترح لك الخدمة المناسبة.</div>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <textarea id="chatInput" rows="1" placeholder="اكتب مشكلة سيارتك... (Enter للإرسال)"></textarea>
+                        <button id="sendBtn">➤</button>
+                    </div>
+                    <div id="imagePreview" style="padding:0 12px 8px; display:none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- كود الشات (JavaScript مع اتصال FastAPI) -->
+    <script>
+        let currentImageBase64 = null;
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        function addMessage(text, isUser, showSuggestion = false, suggestionService = null) {
+            const div = document.createElement('div');
+            div.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            let inner = `<div class="message-content">${text.replace(/\n/g, '<br>')}</div>`;
+            if (showSuggestion && suggestionService) {
+                inner += `<div class="suggestion-card" onclick="bookService('${suggestionService}')">🔧 احجز خدمة ${suggestionService}</div>`;
+            }
+            div.innerHTML = inner;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addBookingForm(service) {
+            const existing = document.getElementById('bookingForm');
+            if (existing) existing.remove();
+            const div = document.createElement('div');
+            div.className = 'message bot-message';
+            div.id = 'bookingForm';
+            div.innerHTML = `<div class="message-content"><div class="booking-card"><h4>📝 حجز: ${service}</h4>
+                <input type="text" id="bookingName" class="booking-input" placeholder="الاسم الكامل">
+                <input type="tel" id="bookingPhone" class="booking-input" placeholder="رقم الهاتف">
+                <input type="text" id="bookingCar" class="booking-input" placeholder="موديل السيارة">
+                <input type="datetime-local" id="bookingDate" class="booking-input">
+                <input type="text" id="bookingLocation" class="booking-input" placeholder="الموقع">
+                <button class="booking-btn" onclick="submitBooking('${service}')">✅ تأكيد الحجز</button></div></div>`;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function submitBooking(service) {
+            const name = document.getElementById('bookingName')?.value;
+            const phone = document.getElementById('bookingPhone')?.value;
+            const car = document.getElementById('bookingCar')?.value;
+            const date = document.getElementById('bookingDate')?.value;
+            const loc = document.getElementById('bookingLocation')?.value;
+            if (!name || !phone || !car || !date || !loc) {
+                alert('❌ الرجاء ملء جميع الحقول');
+                return;
+            }
+            document.getElementById('bookingForm')?.remove();
+            addMessage(`✅ تم تأكيد حجز ${service}\nالاسم: ${name}\nالهاتف: ${phone}\nالسيارة: ${car}\nالتاريخ: ${new Date(date).toLocaleString('ar-EG')}\nالموقع: ${loc}\n📞 سيتم التواصل خلال 24 ساعة`, false);
+        }
+
+        function bookService(service) {
+            addMessage(`أود حجز خدمة: ${service}`, true);
+            addBookingForm(service);
+        }
+
+        function addLoading() {
+            const loading = document.createElement('div');
+            loading.className = 'message bot-message';
+            loading.id = 'loadingMessage';
+            loading.innerHTML = '<div class="message-content">⏳ جاري التحليل...</div>';
+            chatMessages.appendChild(loading);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeLoading() {
+            const loading = document.getElementById('loadingMessage');
+            if (loading) loading.remove();
+        }
+
+        async function sendMessage() {
+            const msg = chatInput.value.trim();
+            if (!msg && !currentImageBase64) return;
+            addMessage(msg || '📷 صورة مرفوعة', true);
+            chatInput.value = '';
+            const fd = new FormData();
+            fd.append('problem', msg || 'حلل الصورة المرفوعة');
+            if (currentImageBase64) fd.append('image', currentImageBase64);
+            addLoading();
+            try {
+                const res = await fetch('/analyze', { method: 'POST', body: fd });
+                const data = await res.json();
+                removeLoading();
+                addMessage(data.diagnosis, false);
+                if (data.suggestion) {
+                    addMessage(`🔧 بناءً على مشكلتك، أنصحك بحجز خدمة "${data.suggestion}"`, false, true, data.suggestion);
+                }
+            } catch (e) {
+                removeLoading();
+                addMessage('❌ خطأ في الاتصال بالخادم', false);
+            }
+            currentImageBase64 = null;
+            const preview = document.getElementById('imagePreview');
+            preview.style.display = 'none';
+            preview.innerHTML = '';
+        }
+
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        sendBtn.addEventListener('click', sendMessage);
+    </script>
+</body>
+</html>
